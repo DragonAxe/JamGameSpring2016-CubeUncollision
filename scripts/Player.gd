@@ -10,6 +10,6 @@ func _ready():
 	cam = get_node("RigidBody/Camera")
 	set_process(true)
 	
-func _process(d):
-	print(d)
+func _process(delta):
+	print(delta)
 	
