@@ -1,31 +1,62 @@
-# test
-extends Node
 
-var body
+extends KinematicBody
+
+
+
 var cam
-var updateE
+var body
 var restrict_rot = 0
 
+var g = -9.8
+var vel = Vector3()
+const MAX_SPEED = 5
+const JUMP_SPEED = 7
+const ACCEL= 2
+const DEACCEL= 4
+const MAX_SLOPE_ANGLE = 30
+
+
+
 func _ready():
-	body = get_node("RigidBody")
-	cam = get_node("RigidBody/Camera")
+	cam = get_node("Camera")
+	body = self
+	
 	var vp_middle = get_viewport().get_rect().size / 2
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	set_process(true)
 	
+	set_process(true)
+	set_fixed_process(true)
+
+
+
+func _fixed_process(delta):
+	player_movement(delta)
+
+
+
 func _process(delta):
 	camera_rotation()
-	player_movement()
 
-func player_movement():
+
+
+# Called by _process()
+func player_movement(delta):
+	var body_xform = body.get_global_transform()
 	if (Input.is_action_pressed("player_forward")):
-		var rot = cam.get_rotation().normalized()
-		var vel = Vector3(sin(rot.y), 0, -cos(rot.y)*cos(rot.x))
-		body.set_linear_velocity(vel*10)
-		print(rot)
-		print(vel)
-	pass
+		body.move(-body_xform.basis[2]/30)
+	
+	if (Input.is_action_pressed("player_backward")):
+		body.move(body_xform.basis[2]/30)
+	
+	if (Input.is_action_pressed("player_left")):
+		body.move(-body_xform.basis[0]/30)
+	
+	if (Input.is_action_pressed("player_right")):
+		body.move(body_xform.basis[0]/30)
 
+
+
+# Called by _process()
 func camera_rotation():
 	# Get middle pos of viewport
 	var vp_middle = get_viewport().get_rect().size / 2
